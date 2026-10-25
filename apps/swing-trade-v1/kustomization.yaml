@@ -1,0 +1,15 @@
+resources:
+  - ../../base/java-app
+
+# Adiciona um prefixo aos nomes (ex: o deployment "app" passa a "swing-trade-app")
+namePrefix: swing-trade-
+
+# Altera todos os seletores e labels para o seu serviço específico
+commonLabels:
+  app: swing-trade-v1
+
+# Procura a "imagem-padrao" no esqueleto e substitui pela sua imagem real
+images:
+  - name: imagem-padrao
+    newName: ghcr.io/kube-automations-v1/swing-trade-v1
+    newTag: latest
