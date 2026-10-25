@@ -5,8 +5,10 @@ resources:
 namePrefix: swing-trade-
 
 # Altera todos os seletores e labels para o seu serviço específico
-commonLabels:
-  app: swing-trade-v1
+labels:
+  - includeSelectors: true
+    pairs:
+      app: swing-trade-v1
 
 # Procura a "imagem-padrao" no esqueleto e substitui pela sua imagem real
 images:
