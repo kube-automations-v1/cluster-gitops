@@ -7,10 +7,9 @@ metadata:
     kubernetes.io/ingress.class: traefik
 spec:
   rules:
-  - host: java.automations.local
-    http:
+  - http:
       paths:
-      - path: /
+      - path: /java
         pathType: Prefix
         backend:
           service:
