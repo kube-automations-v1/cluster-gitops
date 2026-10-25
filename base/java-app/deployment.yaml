@@ -1,0 +1,22 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: app
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: java-service
+  template:
+    metadata:
+      labels:
+        app: java-service
+    spec:
+      imagePullSecrets:
+      - name: ghcr-secret
+      containers:
+      - name: app
+        image: imagem-padrao:latest # Isto será substituído automaticamente
+        imagePullPolicy: Always
+        ports:
+        - containerPort: 8080
