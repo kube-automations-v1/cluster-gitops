@@ -1,0 +1,30 @@
+apiVersion: argoproj.io/v1alpha1
+kind: ApplicationSet
+metadata:
+  name: cluster-workloads
+  namespace: argocd
+spec:
+  generators:
+  - git:
+      repoURL: https://github.com/kube-automations-v1/cluster-gitops.git
+      revision: main
+      # O ArgoCD vai procurar todas as pastas dentro de 'apps/'
+      directories:
+      - path: apps/*
+  template:
+    metadata:
+      # O nome da aplicação será o nome da pasta (ex: bot-discord)
+      name: '{{path.basename}}'
+    spec:
+      project: default
+      source:
+        repoURL: https://github.com/kube-automations-v1/cluster-gitops.git
+        targetRevision: main
+        path: '{{path}}'
+      destination:
+        server: https://kubernetes.default.svc
+        namespace: default
+      syncPolicy:
+        automated:
+          prune: true
+          selfHeal: true
