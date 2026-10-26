@@ -14,4 +14,4 @@ labels:
 images:
   - name: imagem-padrao
     newName: ghcr.io/kube-automations-v1/swing-trade-v1
-    newTag: latest
+    newTag: 2c484c3c37161257d122268bd94c457ecf904913
