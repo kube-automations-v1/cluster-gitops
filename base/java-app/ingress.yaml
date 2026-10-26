@@ -1,0 +1,16 @@
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: app
+spec:
+  rules:
+  - host: automation-v1 # Nome da sua máquina na VPN (Tailscale)
+    http:
+      paths:
+      - path: / # O caminho genérico que será sobrescrito
+        pathType: Prefix
+        backend:
+          service:
+            name: app
+            port:
+              number: 8080
