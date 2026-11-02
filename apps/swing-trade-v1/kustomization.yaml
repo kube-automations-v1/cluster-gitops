@@ -19,4 +19,4 @@ patches:
 images:
   - name: imagem-padrao
     newName: ghcr.io/kube-automations-v1/swing-trade-v1
-    newTag: e3db14fdde1cdc935d5f23d643a14830a8d62555
+    newTag: ad2339fe80715b02a0a43b16df4812a599aed80b
