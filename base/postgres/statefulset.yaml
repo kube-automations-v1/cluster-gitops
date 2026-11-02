@@ -1,0 +1,59 @@
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: db
+spec:
+  serviceName: db
+  replicas: 1
+  selector:
+    matchLabels:
+      app: db
+  template:
+    metadata:
+      labels:
+        app: db
+    spec:
+      terminationGracePeriodSeconds: 60
+      containers:
+      - name: postgres
+        image: imagem-padrao:latest # substituído via kustomize "images"
+        imagePullPolicy: IfNotPresent
+        envFrom:
+        - secretRef:
+            name: credentials # sobrescrito por app (<base>-credentials), criado manualmente
+        env:
+        - name: PGDATA
+          value: /var/lib/postgresql/data/pgdata
+        ports:
+        - containerPort: 5432
+          name: postgres
+        readinessProbe:
+          exec:
+            command: ["sh", "-c", "pg_isready -U \"$POSTGRES_USER\" -d \"$POSTGRES_DB\""]
+          initialDelaySeconds: 5
+          periodSeconds: 10
+        livenessProbe:
+          exec:
+            command: ["sh", "-c", "pg_isready -U \"$POSTGRES_USER\" -d \"$POSTGRES_DB\""]
+          initialDelaySeconds: 30
+          periodSeconds: 20
+          failureThreshold: 6
+        resources:
+          requests:
+            memory: "256Mi"
+            cpu: "100m"
+          limits:
+            memory: "1Gi"
+            cpu: "1"
+        volumeMounts:
+        - name: data
+          mountPath: /var/lib/postgresql/data
+  volumeClaimTemplates:
+  - metadata:
+      name: data
+    spec:
+      accessModes: ["ReadWriteOnce"]
+      storageClassName: local-path-retain
+      resources:
+        requests:
+          storage: 10Gi

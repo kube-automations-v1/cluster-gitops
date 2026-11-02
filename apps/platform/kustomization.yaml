@@ -1,2 +1,3 @@
 resources:
   - middleware.yaml
+  - storageclass.yaml

@@ -1,0 +1,26 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: db
+spec:
+  type: ClusterIP # acesso interno: <base>-db.default.svc:5432
+  selector:
+    app: db
+  ports:
+  - name: postgres
+    port: 5432
+    targetPort: 5432
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: db-external
+spec:
+  type: NodePort # acesso pela VPN: 100.77.183.32:<nodePort>
+  selector:
+    app: db
+  ports:
+  - name: postgres
+    port: 5432
+    targetPort: 5432
+    nodePort: 30432 # sobrescrito por base (scripts/new-base.sh)

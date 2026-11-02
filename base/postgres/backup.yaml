@@ -1,0 +1,49 @@
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: backups
+spec:
+  accessModes: ["ReadWriteOnce"]
+  storageClassName: local-path-retain
+  resources:
+    requests:
+      storage: 5Gi
+---
+apiVersion: batch/v1
+kind: CronJob
+metadata:
+  name: backup
+spec:
+  schedule: "0 3 * * *"
+  concurrencyPolicy: Forbid
+  successfulJobsHistoryLimit: 2
+  failedJobsHistoryLimit: 2
+  jobTemplate:
+    spec:
+      template:
+        spec:
+          restartPolicy: OnFailure
+          containers:
+          - name: backup
+            image: imagem-padrao:latest
+            envFrom:
+            - secretRef:
+                name: credentials
+            env:
+            - name: DB_HOST
+              value: db # sobrescrito por base
+            command: ["sh", "-c"]
+            args:
+            - |
+              set -e
+              f=/backups/$POSTGRES_DB-$(date +%Y%m%d-%H%M%S).sql.gz
+              PGPASSWORD="$POSTGRES_PASSWORD" pg_dump -h "$DB_HOST" -U "$POSTGRES_USER" "$POSTGRES_DB" | gzip > "$f"
+              ls -1t /backups/*.sql.gz | tail -n +8 | xargs -r rm -f
+              ls -lh /backups
+            volumeMounts:
+            - name: backups
+              mountPath: /backups
+          volumes:
+          - name: backups
+            persistentVolumeClaim:
+              claimName: backups

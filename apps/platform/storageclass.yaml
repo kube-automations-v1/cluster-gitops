@@ -1,0 +1,9 @@
+# Igual ao local-path, mas o dado na VM é preservado se o PVC for apagado (Retain).
+# Dados em /var/lib/rancher/k3s/storage/ na VM.
+apiVersion: storage.k8s.io/v1
+kind: StorageClass
+metadata:
+  name: local-path-retain
+provisioner: rancher.io/local-path
+reclaimPolicy: Retain
+volumeBindingMode: WaitForFirstConsumer
