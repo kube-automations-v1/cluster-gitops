@@ -107,7 +107,21 @@ jobs:
 ```
 Requisitos: secret `GITOPS_PAT` (acesso de escrita a este repo e leitura ao shared-pipelines) na org; pacote GHCR acessível pelo cluster (`ghcr-secret`).
 
-## 5. Operação
+## 5. Bases de dados (`base-*`)
+
+Padrão de nome: `base-<nome>` (repo = pasta em `apps/` = prefixo dos recursos). Primeira base: `base-bolt-mesh` (PostgreSQL 17).
+
+- `base/postgres`: StatefulSet (1 réplica, probes `pg_isready`), Service `<base>-db` (ClusterIP :5432), `<base>-db-external` (NodePort, VPN `100.77.183.32:<30432+n>`), CronJob de backup.
+- **Persistência:** PVC `data-<base>-db-0` (10Gi) na StorageClass `local-path-retain` (`apps/platform`): `Retain` — o dado fica na VM em `/var/lib/rancher/k3s/storage/pvc-*` mesmo se o PVC/StatefulSet for apagado (o `local-path` padrão apaga). Ao recriar, é preciso religar o PV manualmente (remover `claimRef`).
+- **Backup:** CronJob diário 03:00, `pg_dump | gzip` em PVC `<base>-backups` (5Gi, últimos 7). Teste: `kubectl create job --from=cronjob/<base>-backup bkp-test`. Os dados estão no mesmo disco da VM: copie os dumps para fora periodicamente.
+- **Credenciais:** secret `<base>-credentials` (`POSTGRES_USER`, `POSTGRES_PASSWORD`, `POSTGRES_DB`) criado manualmente, nunca no Git:
+  `kubectl create secret generic base-x-credentials --from-literal=POSTGRES_USER=... --from-literal=POSTGRES_PASSWORD=... --from-literal=POSTGRES_DB=...`
+- **Pipeline:** repo `base-<nome>` com `Dockerfile` + `initdb/*.sql` chama `postgres-template.yml` (build, smoke test com container, deploy via `scripts/new-base.sh`). `initdb/` só roda com volume vazio.
+- Criar manualmente: `scripts/new-base.sh postgres base-<nome> ghcr.io/kube-automations-v1/base-<nome> [tag] [nodePort]`.
+- Imagens no GHCR são privadas por padrão; `ghcr-secret` é usado pelos pods.
+- Workflows reutilizáveis aninhados exigem `permissions: {contents: read, packages: write}` no job chamador (sem isso: `startup_failure`).
+
+## 6. Operação
 
 ```bash
 kubectl get applications -n argocd          # estado dos apps
@@ -121,8 +135,9 @@ Problemas comuns:
 - 404 do Traefik (`404 page not found`) → host/path errado; 404 JSON/HTML do app → rota ok, endpoint inexistente.
 - Na UI do ArgoCD, o HTML só é servido com header `Accept: text/html` (o `curl` puro devolve o `index.html` bruto).
 
-## 6. Pendências
+## 7. Pendências
 - DNS `automations` (Tailscale) para os clientes.
+- Backup externo (fora da VM) das bases.
 - TLS (hoje HTTP puro dentro da VPN).
 - Gerenciar `argocd-cmd-params-cm` via GitOps.
 - Rotacionar credenciais SSH expostas anteriormente e migrar para chave.
