@@ -8,8 +8,7 @@ metadata:
 spec:
   ingressClassName: traefik
   rules:
-  - host: automations
-    http:
+  - http:
       paths:
       - path: /tecnologia/ms # sobrescrito em cada apps/<ms>/kustomization.yaml
         pathType: Prefix

@@ -1,4 +1,4 @@
-# UI do ArgoCD em http://automations/argocd (requer bootstrap/argocd-cmd-params.yaml aplicado)
+# UI do ArgoCD em http://automation-v1/argocd (requer bootstrap/argocd-cmd-params.yaml aplicado)
 apiVersion: networking.k8s.io/v1
 kind: Ingress
 metadata:
@@ -7,8 +7,7 @@ metadata:
 spec:
   ingressClassName: traefik
   rules:
-  - host: automations
-    http:
+  - http:
       paths:
       - path: /argocd
         pathType: Prefix

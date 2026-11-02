@@ -11,7 +11,7 @@ dev push (repo do ms) ─► GitHub Actions (shared-pipelines) ─► imagem no 
                                                     │
                                           ArgoCD (ApplicationSet) sincroniza
                                                     │
- cliente na VPN ─► http://automations/<tech>/<ms> ─► Traefik ─► Service ─► 2 pods
+ cliente na VPN ─► http://automation-v1/<tech>/<ms> ─► Traefik ─► Service ─► 2 pods
 ```
 
 ## 1. Infraestrutura (VM)
@@ -23,7 +23,7 @@ dev push (repo do ms) ─► GitHub Actions (shared-pipelines) ─► imagem no 
 | Kubernetes | k3s single-node (control-plane), `kubectl` no próprio servidor |
 | Ingress | Traefik (embutido no k3s, v3), Service `LoadBalancer` `192.168.122.200` |
 | LoadBalancer | MetalLB L2, pool `192.168.122.200-250` (`metallb-system`) |
-| GitOps | ArgoCD v3.5.6 (`argocd`), UI em `http://automations/argocd` |
+| GitOps | ArgoCD v3.5.6 (`argocd`), UI em `http://automation-v1/argocd` |
 | Rede | `enp1s0`: `192.168.122.150/24` (estático) + `192.168.1.105/24` (DHCP) |
 
 ### Rede: atenção
@@ -44,13 +44,14 @@ dev push (repo do ms) ─► GitHub Actions (shared-pipelines) ─► imagem no 
 
 ## 2. Padrão de rede e DNS
 
-`http://automations/<tech>/<ms>` — `tech` ∈ `java | go | node | graalvm`. Acesso apenas pela VPN.
+`http://automation-v1/<tech>/<ms>` — `tech` ∈ `java | go | node | graalvm`. Acesso apenas pela VPN.
 
-- O Ingress usa o host `automations`. Resolva o nome renomeando a máquina no Tailscale para `automations` (MagicDNS) ou com `100.77.183.32 automations` em `/etc/hosts`.
-- Teste sem DNS: `curl -H 'Host: automations' http://100.77.183.32/java/<ms>/`.
+- Nome padrão: **`automation-v1`**, o MagicDNS do Tailscale (nome da máquina no client Tailscale). Sem configuração extra: `http://automation-v1/argocd`, `http://automation-v1/java/<ms>/`.
+- Os Ingress **não definem `host:`**: aceitam qualquer Host, então o IP (`http://100.77.183.32/...`), `automation-v1` e o FQDN `automation-v1.tail25d04f.ts.net` funcionam igualmente. Não use mais o nome `automations`.
 - O Middleware Traefik `strip-tech-ms` (`apps/platform`) remove `/<tech>/<ms>` antes de chegar ao pod: `/java/foo/users` → `/users`.
 - Balanceamento: Service `ClusterIP` com 2 réplicas; o Traefik distribui entre os pods (round-robin). Service `LoadBalancer` por app não é usado.
 - Contrato do app: escutar na porta **8080** (env `PORT`).
+- CLI do ArgoCD: `argocd login automation-v1 --plaintext --grpc-web --grpc-web-root-path /argocd --username admin`.
 
 ## 3. Estrutura do repositório
 
@@ -136,7 +137,6 @@ Problemas comuns:
 - Na UI do ArgoCD, o HTML só é servido com header `Accept: text/html` (o `curl` puro devolve o `index.html` bruto).
 
 ## 7. Pendências
-- DNS `automations` (Tailscale) para os clientes.
 - Backup externo (fora da VM) das bases.
 - TLS (hoje HTTP puro dentro da VPN).
 - Gerenciar `argocd-cmd-params-cm` via GitOps.
