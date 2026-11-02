@@ -1,0 +1,22 @@
+resources:
+  - ../../base/app
+
+namePrefix: java-service-
+
+labels:
+  - includeSelectors: true
+    pairs:
+      app: java-service
+
+patches:
+  - target:
+      kind: Ingress
+    patch: |-
+      - op: replace
+        path: /spec/rules/0/http/paths/0/path
+        value: /java/java-service
+
+images:
+  - name: imagem-padrao
+    newName: ghcr.io/kube-automations-v1/app-service-x
+    newTag: java-latest

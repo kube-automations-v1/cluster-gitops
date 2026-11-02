@@ -1,0 +1,10 @@
+# Remove /<tecnologia>/<ms> antes de encaminhar ao pod: /java/foo/users -> /users
+apiVersion: traefik.io/v1alpha1
+kind: Middleware
+metadata:
+  name: strip-tech-ms
+  namespace: default
+spec:
+  stripPrefixRegex:
+    regex:
+    - ^/(java|go|node|graalvm)/[^/]+

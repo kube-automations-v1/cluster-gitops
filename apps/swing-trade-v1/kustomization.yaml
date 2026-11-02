@@ -1,16 +1,21 @@
 resources:
-  - ../../base/java-app
+  - ../../base/app
 
-# Adiciona um prefixo aos nomes (ex: o deployment "app" passa a "swing-trade-app")
-namePrefix: swing-trade-
+namePrefix: swing-trade-v1-
 
-# Altera todos os seletores e labels para o seu serviço específico
 labels:
   - includeSelectors: true
     pairs:
       app: swing-trade-v1
 
-# Procura a "imagem-padrao" no esqueleto e substitui pela sua imagem real
+patches:
+  - target:
+      kind: Ingress
+    patch: |-
+      - op: replace
+        path: /spec/rules/0/http/paths/0/path
+        value: /java/swing-trade-v1
+
 images:
   - name: imagem-padrao
     newName: ghcr.io/kube-automations-v1/swing-trade-v1
