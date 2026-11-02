@@ -23,6 +23,8 @@ spec:
       template:
         spec:
           restartPolicy: OnFailure
+          imagePullSecrets:
+          - name: ghcr-secret
           containers:
           - name: backup
             image: imagem-padrao:latest
