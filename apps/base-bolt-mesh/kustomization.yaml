@@ -1,0 +1,38 @@
+resources:
+  - ../../base/postgres
+
+namePrefix: base-bolt-mesh-
+
+labels:
+  - includeSelectors: true
+    pairs:
+      app: base-bolt-mesh
+
+patches:
+  - target:
+      kind: StatefulSet
+    patch: |-
+      - op: replace
+        path: /spec/template/spec/containers/0/envFrom/0/secretRef/name
+        value: base-bolt-mesh-credentials
+  - target:
+      kind: CronJob
+    patch: |-
+      - op: replace
+        path: /spec/jobTemplate/spec/template/spec/containers/0/envFrom/0/secretRef/name
+        value: base-bolt-mesh-credentials
+      - op: replace
+        path: /spec/jobTemplate/spec/template/spec/containers/0/env/0/value
+        value: base-bolt-mesh-db
+  - target:
+      kind: Service
+      name: db-external
+    patch: |-
+      - op: replace
+        path: /spec/ports/0/nodePort
+        value: 30432
+
+images:
+  - name: imagem-padrao
+    newName: ghcr.io/kube-automations-v1/base-bolt-mesh
+    newTag: ee48003a274d3eb8a745cd91aa6d31942b9f6026
