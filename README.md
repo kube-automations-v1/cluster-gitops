@@ -141,3 +141,10 @@ Problemas comuns:
 - TLS (hoje HTTP puro dentro da VPN).
 - Gerenciar `argocd-cmd-params-cm` via GitOps.
 - Rotacionar credenciais SSH expostas anteriormente e migrar para chave.
+
+## 8. OCS Inventory (serviço especial)
+Repo `ocs-inventory` (Alpine multi-stage, OCS 2.12.6, ~194 MB) + MariaDB 11 (StatefulSet, PVC `local-path-retain`) em `apps/ocs-inventory`, mantido à mão (o pipeline só atualiza `newTag`).
+- Console: `http://automation-v1/ocsreports/` (admin/admin — trocar no 1º acesso)
+- Agentes: `http://automation-v1/ocsinventory` · API: `/ocsapi/v1/computers`
+- Exceção ao padrão `/<tech>/<ms>`: o console usa links absolutos, então não há strip-prefix.
+- Secret manual `ocs-inventory-credentials` (MARIADB_ROOT_PASSWORD/USER/PASSWORD/DATABASE).
