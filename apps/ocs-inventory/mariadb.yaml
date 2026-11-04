@@ -1,0 +1,54 @@
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: ocs-inventory-db
+spec:
+  serviceName: ocs-inventory-db
+  replicas: 1
+  selector:
+    matchLabels: {app: ocs-inventory-db}
+  template:
+    metadata:
+      labels: {app: ocs-inventory-db}
+    spec:
+      containers:
+      - name: mariadb
+        image: mariadb:11
+        envFrom:
+        - secretRef:
+            name: ocs-inventory-credentials # manual: MARIADB_ROOT_PASSWORD/USER/PASSWORD/DATABASE
+        ports:
+        - containerPort: 3306
+        readinessProbe:
+          exec:
+            command: ["healthcheck.sh", "--connect", "--innodb_initialized"]
+          initialDelaySeconds: 10
+          periodSeconds: 10
+        resources:
+          requests: {memory: 256Mi, cpu: 100m}
+          limits: {memory: 1Gi, cpu: "1"}
+        volumeMounts:
+        - {name: data, mountPath: /var/lib/mysql}
+        - {name: schema, mountPath: /docker-entrypoint-initdb.d}
+      volumes:
+      - name: schema
+        configMap:
+          name: ocs-schema
+  volumeClaimTemplates:
+  - metadata:
+      name: data
+    spec:
+      accessModes: ["ReadWriteOnce"]
+      storageClassName: local-path-retain
+      resources:
+        requests:
+          storage: 5Gi
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: ocs-inventory-db
+spec:
+  selector: {app: ocs-inventory-db}
+  ports:
+  - port: 3306

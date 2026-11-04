@@ -1,0 +1,15 @@
+# Serviço especial (console + agentes em paths próprios, sem strip-prefix) mantido à mão.
+# O pipeline só atualiza a linha newTag abaixo (new-app.sh ignora apps que já existem).
+resources:
+  - mariadb.yaml
+  - app.yaml
+
+configMapGenerator:
+  - name: ocs-schema
+    files:
+      - ocsbase.sql
+
+images:
+  - name: imagem-padrao
+    newName: ghcr.io/kube-automations-v1/ocs-inventory
+    newTag: latest

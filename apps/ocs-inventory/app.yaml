@@ -1,0 +1,74 @@
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: ocs-inventory-data
+spec:
+  accessModes: ["ReadWriteOnce"]
+  storageClassName: local-path-retain
+  resources:
+    requests:
+      storage: 2Gi
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: ocs-inventory-app
+spec:
+  replicas: 1
+  strategy:
+    type: Recreate # PVC RWO
+  selector:
+    matchLabels: {app: ocs-inventory-app}
+  template:
+    metadata:
+      labels: {app: ocs-inventory-app}
+    spec:
+      imagePullSecrets:
+      - name: ghcr-secret
+      containers:
+      - name: app
+        image: imagem-padrao:latest
+        env:
+        - {name: OCS_DB_SERVER, value: ocs-inventory-db}
+        - {name: OCS_DB_NAME, valueFrom: {secretKeyRef: {name: ocs-inventory-credentials, key: MARIADB_DATABASE}}}
+        - {name: OCS_DB_USER, valueFrom: {secretKeyRef: {name: ocs-inventory-credentials, key: MARIADB_USER}}}
+        - {name: OCS_DB_PASS, valueFrom: {secretKeyRef: {name: ocs-inventory-credentials, key: MARIADB_PASSWORD}}}
+        ports:
+        - containerPort: 8080
+        readinessProbe:
+          httpGet: {path: /ocsreports/, port: 8080}
+          initialDelaySeconds: 10
+          periodSeconds: 10
+        resources:
+          requests: {memory: 256Mi, cpu: 100m}
+          limits: {memory: 768Mi, cpu: "1"}
+        volumeMounts:
+        - {name: data, mountPath: /var/lib/ocsinventory-reports}
+      volumes:
+      - name: data
+        persistentVolumeClaim:
+          claimName: ocs-inventory-data
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: ocs-inventory-app
+spec:
+  selector: {app: ocs-inventory-app}
+  ports:
+  - port: 8080
+---
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: ocs-inventory-app
+spec:
+  ingressClassName: traefik
+  rules:
+  - http:
+      paths:
+      - {path: /ocsreports, pathType: Prefix, backend: {service: {name: ocs-inventory-app, port: {number: 8080}}}}
+      - {path: /ocsinventory, pathType: Prefix, backend: {service: {name: ocs-inventory-app, port: {number: 8080}}}}
+      - {path: /ocsapi, pathType: Prefix, backend: {service: {name: ocs-inventory-app, port: {number: 8080}}}}
+      - {path: /download, pathType: Prefix, backend: {service: {name: ocs-inventory-app, port: {number: 8080}}}}
+      - {path: /snmp, pathType: Prefix, backend: {service: {name: ocs-inventory-app, port: {number: 8080}}}}
