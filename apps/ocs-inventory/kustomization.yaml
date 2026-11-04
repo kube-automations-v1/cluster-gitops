@@ -12,4 +12,4 @@ configMapGenerator:
 images:
   - name: imagem-padrao
     newName: ghcr.io/kube-automations-v1/ocs-inventory
-    newTag: 9c49f756a9d4b1c98d691576284705bb2b1b5697
+    newTag: 70491963ed8a46bdf3f5e27faf7c77adbbc2178a
