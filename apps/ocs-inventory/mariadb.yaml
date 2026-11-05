@@ -11,6 +11,11 @@ spec:
     metadata:
       labels: {app: ocs-inventory-db}
     spec:
+      # roda direto como o usuário do banco: evita o gosu do entrypoint (travava a 100% de CPU no kernel novo)
+      securityContext:
+        runAsUser: 999
+        runAsGroup: 999
+        fsGroup: 999
       containers:
       - name: mariadb
         image: mariadb:11

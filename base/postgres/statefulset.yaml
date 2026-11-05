@@ -14,6 +14,11 @@ spec:
         app: db
     spec:
       terminationGracePeriodSeconds: 60
+      # roda direto como o usuário do banco: evita o gosu do entrypoint (travava a 100% de CPU no kernel novo)
+      securityContext:
+        runAsUser: 70
+        runAsGroup: 70
+        fsGroup: 70
       imagePullSecrets:
       - name: ghcr-secret
       containers:
