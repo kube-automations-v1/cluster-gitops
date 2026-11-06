@@ -1,0 +1,22 @@
+resources:
+  - ../../base/app
+
+namePrefix: engine-bolt-mesh-
+
+labels:
+  - includeSelectors: true
+    pairs:
+      app: engine-bolt-mesh
+
+patches:
+  - target:
+      kind: Ingress
+    patch: |-
+      - op: replace
+        path: /spec/rules/0/http/paths/0/path
+        value: /java/engine-bolt-mesh
+
+images:
+  - name: imagem-padrao
+    newName: ghcr.io/kube-automations-v1/engine-bolt-mesh
+    newTag: e23399dd5d29900749768675228beb7da5812e55
