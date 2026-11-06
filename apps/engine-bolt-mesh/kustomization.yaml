@@ -16,6 +16,19 @@ patches:
         path: /spec/rules/0/http/paths/0/path
         value: /java/engine-bolt-mesh
 
+  - target:
+      kind: Deployment
+    patch: |-
+      - op: add
+        path: /spec/template/spec/containers/0/env/-
+        value: {name: DB_URL, value: "jdbc:postgresql://base-bolt-mesh-db:5432/bolt_mesh"}
+      - op: add
+        path: /spec/template/spec/containers/0/env/-
+        value: {name: DB_USER, valueFrom: {secretKeyRef: {name: base-bolt-mesh-credentials, key: POSTGRES_USER}}}
+      - op: add
+        path: /spec/template/spec/containers/0/env/-
+        value: {name: DB_PASSWORD, valueFrom: {secretKeyRef: {name: base-bolt-mesh-credentials, key: POSTGRES_PASSWORD}}}
+
 images:
   - name: imagem-padrao
     newName: ghcr.io/kube-automations-v1/engine-bolt-mesh
