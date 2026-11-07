@@ -6,4 +6,4 @@ resources:
 images:
   - name: imagem-padrao
     newName: ghcr.io/kube-automations-v1/glpi
-    newTag: c49d46edf02b340b8f49af74f01d0a2337751f33
+    newTag: 6ef1789378eb6048c8c1d4c3a6375d7125d1e866
