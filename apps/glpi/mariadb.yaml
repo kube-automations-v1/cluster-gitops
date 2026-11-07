@@ -18,7 +18,7 @@ spec:
         fsGroup: 999
       containers:
       - name: mariadb
-        image: mariadb:11
+        image: mariadb:11.4
         # limite de fds alto faz o init/shutdown do mariadb travar nesse kernel
         command: ["sh", "-c", "ulimit -n 1024; exec docker-entrypoint.sh mariadbd --innodb-use-native-aio=0"]
         envFrom:
