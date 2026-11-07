@@ -19,6 +19,8 @@ spec:
       containers:
       - name: mariadb
         image: mariadb:11
+        # limite de fds alto faz o init/shutdown do mariadb travar nesse kernel
+        command: ["sh", "-c", "ulimit -n 1024; exec docker-entrypoint.sh mariadbd"]
         envFrom:
         - secretRef:
             name: glpi-credentials # manual: MARIADB_ROOT_PASSWORD/USER/PASSWORD/DATABASE
