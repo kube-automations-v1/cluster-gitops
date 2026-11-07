@@ -148,3 +148,10 @@ Repo `ocs-inventory` (Alpine multi-stage, OCS 2.12.6, ~194 MB) + MariaDB 11 (Sta
 - Agentes: `http://automation-v1/ocsinventory` · API: `/ocsapi/v1/computers`
 - Exceção ao padrão `/<tech>/<ms>`: o console usa links absolutos, então não há strip-prefix.
 - Secret manual `ocs-inventory-credentials` (MARIADB_ROOT_PASSWORD/USER/PASSWORD/DATABASE).
+
+## 9. GLPI (serviço especial)
+Repo `glpi` (Alpine + Apache/PHP 8.4, GLPI 12.0.1, ~640 MB) + manifests em `apps/glpi` (PVC `glpi-data` em `/var/glpi`, mantido à mão; o pipeline só atualiza `newTag`).
+- URL: `http://automation-v1/glpi/` (glpi/glpi, tech/tech, normal/normal, post-only/postonly — trocar senhas)
+- Sem strip-prefix (path nativo `/glpi`).
+- Banco: **compartilhado com o MariaDB do OCS** (`ocs-inventory-db`, database/usuário `glpi`), pois a inicialização de um MariaDB novo trava no kernel atual da VM. Database e usuário criados à mão.
+- Secret manual `glpi-credentials`. A 1ª subida instala o schema (~30 min com o disco lento).
