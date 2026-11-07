@@ -23,6 +23,7 @@ spec:
     metadata:
       labels: {app: glpi-app}
     spec:
+      enableServiceLinks: false # senão o Service glpi-db injeta GLPI_DB_PORT=tcp://...
       imagePullSecrets:
       - name: ghcr-secret
       containers:
