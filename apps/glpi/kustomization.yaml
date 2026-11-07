@@ -1,0 +1,9 @@
+# Serviço especial mantido à mão (path nativo /glpi, sem strip-prefix). O pipeline só atualiza newTag.
+resources:
+  - mariadb.yaml
+  - app.yaml
+
+images:
+  - name: imagem-padrao
+    newName: ghcr.io/kube-automations-v1/glpi
+    newTag: latest

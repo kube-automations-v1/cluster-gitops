@@ -1,0 +1,54 @@
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: glpi-db
+spec:
+  serviceName: glpi-db
+  replicas: 1
+  selector:
+    matchLabels: {app: glpi-db}
+  template:
+    metadata:
+      labels: {app: glpi-db}
+    spec:
+      # roda direto como o usuário do banco: evita o gosu do entrypoint (travava a 100% de CPU no kernel novo)
+      securityContext:
+        runAsUser: 999
+        runAsGroup: 999
+        fsGroup: 999
+      containers:
+      - name: mariadb
+        image: mariadb:11
+        envFrom:
+        - secretRef:
+            name: glpi-credentials # manual: MARIADB_ROOT_PASSWORD/USER/PASSWORD/DATABASE
+        ports:
+        - containerPort: 3306
+        readinessProbe:
+          exec:
+            command: ["healthcheck.sh", "--connect", "--innodb_initialized"]
+          initialDelaySeconds: 10
+          periodSeconds: 10
+        resources:
+          requests: {memory: 256Mi, cpu: 100m}
+          limits: {memory: 1Gi, cpu: "1"}
+        volumeMounts:
+        - {name: data, mountPath: /var/lib/mysql}
+  volumeClaimTemplates:
+  - metadata:
+      name: data
+    spec:
+      accessModes: ["ReadWriteOnce"]
+      storageClassName: local-path-retain
+      resources:
+        requests:
+          storage: 5Gi
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: glpi-db
+spec:
+  selector: {app: glpi-db}
+  ports:
+  - port: 3306
