@@ -1,6 +1,6 @@
+# Banco: database/usuário "glpi" no MariaDB do ocs-inventory (o init de um MariaDB novo trava nesse kernel).
 # Serviço especial mantido à mão (path nativo /glpi, sem strip-prefix). O pipeline só atualiza newTag.
 resources:
-  - mariadb.yaml
   - app.yaml
 
 images:

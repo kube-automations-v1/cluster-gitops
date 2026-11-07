@@ -30,7 +30,7 @@ spec:
       - name: app
         image: imagem-padrao:latest
         env:
-        - {name: GLPI_DB_HOST, value: glpi-db}
+        - {name: GLPI_DB_HOST, value: ocs-inventory-db}
         - {name: GLPI_DB_NAME, valueFrom: {secretKeyRef: {name: glpi-credentials, key: MARIADB_DATABASE}}}
         - {name: GLPI_DB_USER, valueFrom: {secretKeyRef: {name: glpi-credentials, key: MARIADB_USER}}}
         - {name: GLPI_DB_PASSWORD, valueFrom: {secretKeyRef: {name: glpi-credentials, key: MARIADB_PASSWORD}}}
