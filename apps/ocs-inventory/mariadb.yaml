@@ -12,8 +12,10 @@ spec:
       labels: {app: ocs-inventory-db}
     spec:
       # roda direto como o usuário do banco: evita o gosu do entrypoint (travava a 100% de CPU no kernel novo)
-      shareProcessNamespace: true
       securityContext:
+        # perfil cri-containerd do AppArmor nega signal entre processos (checkpoint do postgres / init do mariadb)
+        appArmorProfile:
+          type: Unconfined
         runAsUser: 999
         runAsGroup: 999
         fsGroup: 999
