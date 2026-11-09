@@ -32,4 +32,4 @@ patches:
 images:
   - name: imagem-padrao
     newName: ghcr.io/kube-automations-v1/engine-bolt-mesh
-    newTag: de335e325c151db9fcccbb82da4d9f4fdff435d7
+    newTag: 93d2fb4cc203993f4e80e1ef7ab4a43581b436d9
