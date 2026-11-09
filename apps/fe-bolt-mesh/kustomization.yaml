@@ -21,4 +21,4 @@ patches:
 images:
   - name: imagem-padrao
     newName: ghcr.io/kube-automations-v1/fe-bolt-mesh
-    newTag: ca1aad07bd566a89b13b3f415fc8de78c6154910
+    newTag: c87a8b95377117f12577b68cc6d6a7e16fb6b177
