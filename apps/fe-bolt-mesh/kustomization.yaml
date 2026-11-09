@@ -1,0 +1,22 @@
+resources:
+  - ../../base/app
+
+namePrefix: fe-bolt-mesh-
+
+labels:
+  - includeSelectors: true
+    pairs:
+      app: fe-bolt-mesh
+
+patches:
+  - target:
+      kind: Ingress
+    patch: |-
+      - op: replace
+        path: /spec/rules/0/http/paths/0/path
+        value: /node/fe-bolt-mesh
+
+images:
+  - name: imagem-padrao
+    newName: ghcr.io/kube-automations-v1/fe-bolt-mesh
+    newTag: ca1aad07bd566a89b13b3f415fc8de78c6154910
