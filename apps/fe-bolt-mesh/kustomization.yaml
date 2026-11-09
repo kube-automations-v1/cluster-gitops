@@ -8,8 +8,7 @@ labels:
     pairs:
       app: fe-bolt-mesh
 
-# Exceção ao padrão /<tech>/<ms>: a SPA fica na raiz (http://automation-v1/) e chama a API
-# por caminho absoluto (/java/engine-bolt-mesh/api/v1), então não usa strip-prefix.
+# SPA em /node/bolt-mesh (strip-prefix padrão). O vite.config.ts usa base '/node/bolt-mesh/' no build.
 # Mantido à mão (o pipeline só atualiza newTag).
 patches:
   - target:
@@ -17,9 +16,7 @@ patches:
     patch: |-
       - op: replace
         path: /spec/rules/0/http/paths/0/path
-        value: /
-      - op: remove
-        path: /metadata/annotations
+        value: /node/bolt-mesh
 
 images:
   - name: imagem-padrao
