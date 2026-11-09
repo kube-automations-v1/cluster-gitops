@@ -8,13 +8,18 @@ labels:
     pairs:
       app: fe-bolt-mesh
 
+# Exceção ao padrão /<tech>/<ms>: a SPA fica na raiz (http://automation-v1/) e chama a API
+# por caminho absoluto (/java/engine-bolt-mesh/api/v1), então não usa strip-prefix.
+# Mantido à mão (o pipeline só atualiza newTag).
 patches:
   - target:
       kind: Ingress
     patch: |-
       - op: replace
         path: /spec/rules/0/http/paths/0/path
-        value: /node/fe-bolt-mesh
+        value: /
+      - op: remove
+        path: /metadata/annotations
 
 images:
   - name: imagem-padrao

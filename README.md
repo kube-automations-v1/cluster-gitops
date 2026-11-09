@@ -155,3 +155,6 @@ Repo `glpi` (Alpine + Apache/PHP 8.4, GLPI 12.0.1, ~640 MB) + manifests em `apps
 - Sem strip-prefix (path nativo `/glpi`).
 - Banco: **compartilhado com o MariaDB do OCS** (`ocs-inventory-db`, database/usuário `glpi`), pois a inicialização de um MariaDB novo trava no kernel atual da VM. Database e usuário criados à mão.
 - Secret manual `glpi-credentials`. A 1ª subida instala o schema (~30 min com o disco lento).
+
+## 10. fe-bolt-mesh (frontend, exceção ao padrão)
+Repo `fe-bolt-mesh` (Vite/React → nginx:alpine, porta 8080, ~95 MB, fallback SPA). Servido na **raiz** `http://automation-v1/` sem strip-prefix, pois chama a API por caminho absoluto `/java/engine-bolt-mesh/api/v1` (mesma origem, sem CORS). Rotas mais específicas (`/java/...`, `/argocd`, `/glpi`...) têm prioridade no Traefik.
