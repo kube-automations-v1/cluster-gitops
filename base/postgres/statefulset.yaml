@@ -14,6 +14,8 @@ spec:
         app: db
     spec:
       terminationGracePeriodSeconds: 60
+      # o banco não pode ser PID 1: sem isso o filho não consegue sinalizar o postmaster (EPERM) e a recovery falha
+      shareProcessNamespace: true
       # roda direto como o usuário do banco: evita o gosu do entrypoint (travava a 100% de CPU no kernel novo)
       securityContext:
         runAsUser: 70
